@@ -7,17 +7,16 @@ import (
 	"github.com/miku/lynd"
 )
 
-type ZeroTarget struct{}
+type NilTarget struct{}
 
-func (target ZeroTarget) Exists() bool { return false }
+func (target NilTarget) Exists() bool { return false }
 
 type Executable struct {
 	Name    string
 	Message string
 }
 
-func (task Executable) Requires() interface{} { return nil }
-
+func (task Executable) Requires() []lynd.Task { return nil }
 func (task Executable) Run() error {
 	return fmt.Errorf("%s not found - %s", task.Name, task.Message)
 }
@@ -25,7 +24,7 @@ func (task Executable) Run() error {
 func (task Executable) Output() lynd.Target {
 	p, err := exec.LookPath(task.Name)
 	if err != nil {
-		return ZeroTarget{}
+		return NilTarget{}
 	}
 	return lynd.LocalTarget{Path: p}
 }

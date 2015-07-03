@@ -1,7 +1,6 @@
 package lynd
 
 import (
-	"io/ioutil"
 	"reflect"
 	"testing"
 )
@@ -23,10 +22,20 @@ func TestLocalTargetExists(t *testing.T) {
 	}
 }
 
+type externalTask struct {
+	Path string
+}
+
+func (task externalTask) Requires() []Task { return nil }
+func (task externalTask) Run() error       { return nil }
+func (task externalTask) Output() Target {
+	return LocalTarget{Path: task.Path}
+}
+
 type simpleTask struct{}
 
-func (task simpleTask) Requires() interface{} {
-	return LocalTarget{Path: "/hello/world"}
+func (task simpleTask) Requires() []Task {
+	return []Task{externalTask{Path: "/hello/world"}}
 }
 
 func (task simpleTask) Run() error     { return nil }
@@ -34,10 +43,10 @@ func (task simpleTask) Output() Target { return nil }
 
 type taskWithTwoReqs struct{}
 
-func (task taskWithTwoReqs) Requires() interface{} {
-	return []Target{
-		LocalTarget{Path: "/hello/world"},
-		LocalTarget{Path: "/hello/moon"},
+func (task taskWithTwoReqs) Requires() []Task {
+	return []Task{
+		externalTask{Path: "/hello/world"},
+		externalTask{Path: "/hello/moon"},
 	}
 }
 
@@ -54,7 +63,7 @@ func TestInputAsPath(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		p := In(c.task).Path()
+		p := LocalInput(c.task).Path
 		if p != c.path {
 			t.Errorf("got %s, want %s", p, c.path)
 		}
@@ -71,56 +80,9 @@ func TestInputAsPathList(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		p := In(c.task).PathList()
+		p := LocalPaths(c.task)
 		if !reflect.DeepEqual(p, c.pathlist) {
 			t.Errorf("got %v, want %v", p, c.pathlist)
-		}
-	}
-}
-
-type taskWithOutput struct{}
-
-func (task taskWithOutput) Requires() interface{} { return nil }
-func (task taskWithOutput) Run() error            { return nil }
-func (task taskWithOutput) Output() Target {
-	return LocalTarget{Path: "/tmp/Hello"}
-}
-
-func TestTaskWithOutput(t *testing.T) {
-	var cases = []struct {
-		task    Task
-		content string
-	}{
-		{taskWithOutput{}, "Hello World"},
-	}
-
-	for _, c := range cases {
-		f, err := Out(c.task).CreateFile()
-		if err != nil {
-			t.Error(err)
-		}
-		defer f.Close()
-
-		_, err = f.WriteString(c.content)
-		if err != nil {
-			t.Error(err)
-		}
-
-		err = f.Commit()
-		if err != nil {
-			t.Error(err)
-		}
-
-		file, err := Out(c.task).File()
-		if err != nil {
-			t.Error(err)
-		}
-		content, err := ioutil.ReadAll(file)
-		if err != nil {
-			t.Error(err)
-		}
-		if string(content) != c.content {
-			t.Errorf("got %s, want %s", string(content), c.content)
 		}
 	}
 }
