@@ -50,8 +50,8 @@ func Dependencies(task Task) []Task {
 	}
 }
 
-// MustInput returns the first output of the required task and panics, if
-// there is no target to return.
+// MustInput returns the output of the first required task and panics, if
+// there the given task has not a single dependency.
 func MustInput(task Task) Target {
 	t, err := Input(task)
 	if err != nil {
@@ -60,7 +60,8 @@ func MustInput(task Task) Target {
 	return t
 }
 
-// Input returns the first target and an error, if no target is found.
+// Input returns the first dependent tasks' output and an error, if no target
+// is found.
 func Input(task Task) (Target, error) {
 	deps := Dependencies(task)
 	if len(deps) == 0 {

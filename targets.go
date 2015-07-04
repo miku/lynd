@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// tempPrefix is prepended to any temporary filename.
 const tempPrefix = "lynd-"
 
 // WithoutIO implements an io.ReadWriteCloser, that does nothing.
@@ -49,6 +50,7 @@ type File struct {
 	f    *os.File
 }
 
+// Read from io.Reader.
 func (t *File) Read(p []byte) (n int, err error) {
 	if t.f == nil {
 		f, err := os.Open(t.Path)
@@ -60,6 +62,7 @@ func (t *File) Read(p []byte) (n int, err error) {
 	return t.f.Read(p)
 }
 
+// Write from io.Writer.
 func (t *File) Write(p []byte) (n int, err error) {
 	if t.f == nil {
 		f, err := ioutil.TempFile("", tempPrefix)
@@ -71,6 +74,7 @@ func (t *File) Write(p []byte) (n int, err error) {
 	return t.f.Write(p)
 }
 
+// Close from io.Closer.
 func (t *File) Close() error {
 	if t.f != nil {
 		err := t.f.Close()
@@ -86,13 +90,17 @@ func (t *File) Close() error {
 	return nil
 }
 
+// Name should returns the full path of the file.
 func (t *File) Name() string { return t.Path }
 
+// Exists returns true, if we could actually stat the file.
+// TODO(miku): be more strict.
 func (t *File) Exists() bool {
 	_, err := os.Stat(t.Name())
 	return err == nil
 }
 
+// String reports the path.
 func (t *File) String() string {
 	return t.Path
 }
