@@ -9,13 +9,13 @@ import (
 	"github.com/miku/structs"
 )
 
-// FuncMap maps string keys to functions from string to (string, error).
-type FuncMap map[string]func(string) (string, error)
+// funcMap maps string keys to functions from string to (string, error).
+type funcMap map[string]func(string) (string, error)
 
 // defaultFuncs contain custom functions, that may be invoked during defaults
 // evaluation. Most useful example might be a "today". Maybe all special
 // methods should carry a prefix, like `s:today`.
-var defaultsFuncs = FuncMap{
+var defaultsFuncs = funcMap{
 	"today": func(value string) (string, error) {
 		return time.Now().Format("2006-01-02"), nil
 	},
