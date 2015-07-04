@@ -43,7 +43,7 @@ var defaultsFuncs = funcMap{
 // value. A pointer to a task must be passed in, since they this methods
 // potentially alters field values. Subsequent calls to SetDefaults should not
 // change the task, since any zero value has been filled on the first call or
-// SetDefault returned an error.
+// SetDefaults returned an error.
 func SetDefaults(task Task) error {
 	s := structs.New(task)
 	for _, field := range s.Fields() {
