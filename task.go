@@ -33,7 +33,7 @@ var defaultsFuncs = FuncMap{
 	//
 	// custom func could be circumvented with a generic content based filepath
 	// e.g.
-	//		allow AutoTargets to be generated from the output of a task
+	//      allow AutoTargets to be generated from the output of a task
 	//      task.Run will be always called, but the task may report completion, if nothing has changed
 	//      e.g. a ftp mirror and the output of the task is just a list of mirrored files.
 	//
