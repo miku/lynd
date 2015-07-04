@@ -65,7 +65,7 @@ func TestSetDefaultsInt(t *testing.T) {
 	for _, c := range cases {
 		setDefaults(&c.task)
 		if c.task.Val != c.Val {
-			t.Errorf("got %s, want %s", c.task.Val, c.Val)
+			t.Errorf("got %d, want %d", c.task.Val, c.Val)
 		}
 	}
 }
@@ -82,7 +82,7 @@ func TestSetDefaultsFloat(t *testing.T) {
 	for _, c := range cases {
 		setDefaults(&c.task)
 		if c.task.Val != c.Val {
-			t.Errorf("got %s, want %s", c.task.Val, c.Val)
+			t.Errorf("got %f, want %f", c.task.Val, c.Val)
 		}
 	}
 }
