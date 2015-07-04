@@ -9,10 +9,12 @@ import (
 	"github.com/miku/structs"
 )
 
-type TagEvaluator func(Task) Task
-
+// FuncMap maps string keys to functions from string to (string, error).
 type FuncMap map[string]func(string) (string, error)
 
+// defaultFuncs contain custom functions, that may be invoked during defaults
+// evaluation. Most useful example might be a "today". Maybe all special
+// methods should carry a prefix, like `s:today`.
 var defaultsFuncs = FuncMap{
 	"today": func(value string) (string, error) {
 		return time.Now().Format("2006-01-02"), nil
@@ -20,9 +22,26 @@ var defaultsFuncs = FuncMap{
 	"yesterday": func(value string) (string, error) {
 		return time.Now().Add(-24 * time.Hour).Format("2006-01-02"), nil
 	},
+	// more here? ...
+	//
+	// "weekly"
+	// "weekly:<weekday>"
+	// "random"
+	// "func:someCustomFuncOnStruct"
+	//
+	// ...
+	//
+	// custom func could be circumvented with a generic content based filepath
+	// e.g.
+	//		allow AutoTargets to be generated from the output of a task
+	//      task.Run will be always called, but the task may report completion, if nothing has changed
+	//      e.g. a ftp mirror and the output of the task is just a list of mirrored files.
+	//
 }
 
-// setDefaults evaluates the default struct tag.
+// setDefaults evaluates the default struct tag if the field has the zero
+// value. A pointer to a task must be passed in, since they this methods
+// potentially alters field values.
 func setDefaults(task Task) error {
 	s := structs.New(task)
 	for _, field := range s.Fields() {
@@ -33,9 +52,9 @@ func setDefaults(task Task) error {
 		if v == "" {
 			continue
 		}
+		var err error
 		for key, f := range defaultsFuncs {
 			if v == key {
-				var err error
 				v, err = f(v)
 				if err != nil {
 					return err
