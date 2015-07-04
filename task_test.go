@@ -46,7 +46,7 @@ func TestSetDefaultsString(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		setDefaults(&c.task)
+		SetDefaults(&c.task)
 		if c.task.Val != c.Val {
 			t.Errorf("got %s, want %s", c.task.Val, c.Val)
 		}
@@ -63,7 +63,7 @@ func TestSetDefaultsInt(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		setDefaults(&c.task)
+		SetDefaults(&c.task)
 		if c.task.Val != c.Val {
 			t.Errorf("got %d, want %d", c.task.Val, c.Val)
 		}
@@ -80,7 +80,7 @@ func TestSetDefaultsFloat(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		setDefaults(&c.task)
+		SetDefaults(&c.task)
 		if c.task.Val != c.Val {
 			t.Errorf("got %f, want %f", c.task.Val, c.Val)
 		}
@@ -97,7 +97,7 @@ func TestSetDefaultsToday(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		setDefaults(&c.task)
+		SetDefaults(&c.task)
 		if c.task.Date != c.Date {
 			t.Errorf("got %s, want %s", c.task.Date, c.Date)
 		}
@@ -114,7 +114,7 @@ func TestSetDefaultsYesterday(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		setDefaults(&c.task)
+		SetDefaults(&c.task)
 		if c.task.Date != c.Date {
 			t.Errorf("got %s, want %s", c.task.Date, c.Date)
 		}
