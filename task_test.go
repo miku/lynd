@@ -131,7 +131,7 @@ func TestSetDefaultsWeekly(t *testing.T) {
 		task testTaskWeekly
 		Date string
 	}{
-		{testTaskWeekly{}, "2015-06-29"},
+		{testTaskWeekly{Date: "2015-07-05"}, "2015-06-29"},
 	}
 
 	for _, c := range cases {
@@ -148,7 +148,8 @@ func TestTaskID(t *testing.T) {
 		task Task
 		id   string
 	}{
-		{&testTaskWeekly{}, "lynd/testTaskWeekly/date-2015-06-29"},
+		{&testTaskWeekly{Date: "2015-07-05"}, "lynd/testTaskWeekly/date-2015-06-29"},
+		{&testTaskYesterday{Date: "2015-07-01"}, "lynd/testTaskYesterday/date-2015-07-01"},
 	}
 
 	for _, c := range cases {
