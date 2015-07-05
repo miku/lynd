@@ -131,3 +131,19 @@ func Adjust(task Task) error {
 	}
 	return nil
 }
+
+func Init(task Task) error {
+	err := SetDefaults(task)
+	if err != nil {
+		return err
+	}
+	return Adjust(task)
+}
+
+// TaskID returns a string, that uniquely identifies a task. The ID will
+// consist of the task name (its type) and a slugified version of its
+// significant parameters.
+func TaskID(task Task) string {
+	t := reflect.TypeOf(task)
+	return fmt.Sprintf("%s", t.Name())
+}

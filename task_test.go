@@ -142,3 +142,20 @@ func TestSetDefaultsWeekly(t *testing.T) {
 		}
 	}
 }
+
+func TestTaskID(t *testing.T) {
+	var cases = []struct {
+		task Task
+		id   string
+	}{
+		{testTaskWeekly{}, "testTaskWeekly-date-2015-06-29"},
+	}
+
+	for _, c := range cases {
+		Init(c.task)
+		id := TaskID(c.task)
+		if id != c.id {
+			t.Errorf("got %s, want %s", id, c.id)
+		}
+	}
+}
