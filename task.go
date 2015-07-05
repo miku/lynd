@@ -43,10 +43,9 @@ var adjustFuncs = funcMap{
 // shiftWeekday makes a week begin on Monday.
 func shiftWeekday(weekday int) int {
 	if weekday == 0 {
-		weekday = 7
+		return 7
 	}
-	weekday = weekday - 1
-	return weekday
+	return weekday - 1
 }
 
 // setFieldValue will try to set the value of a given field to v, which is
