@@ -158,6 +158,7 @@ func ParameterMap(task Task) map[string]string {
 	return m
 }
 
+// TODO(miku): replace with something real.
 func mapToSlug(m map[string]string) string {
 	var parts []string
 	for k, v := range m {
