@@ -16,7 +16,8 @@ func renameMkdir(src, dst string) error {
 	return os.Rename(src, dst)
 }
 
-// rename copies the file to the destination device first, then renames it.
+// rename copies a file from src to dst. It will create necessary directories
+// and will fallback to cp and rename, if operation spans devices.
 func rename(src, dst string) error {
 	err := renameMkdir(src, dst)
 	if err == nil {
