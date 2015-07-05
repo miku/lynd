@@ -98,13 +98,14 @@ func SetDefaults(task Task) error {
 		}
 		var err error
 		for key, f := range defaultsFuncs {
-			if v == key {
-				v, err = f(v)
-				if err != nil {
-					return err
-				}
-				break
+			if v != key {
+				continue
 			}
+			v, err = f(v)
+			if err != nil {
+				return err
+			}
+			break
 		}
 		return setFieldValue(field, v)
 	}
@@ -124,13 +125,14 @@ func Adjust(task Task) error {
 		}
 		var err error
 		for key, f := range adjustFuncs {
-			if v == key {
-				v, err = f(field.Value())
-				if err != nil {
-					return err
-				}
-				break
+			if v != key {
+				continue
 			}
+			v, err = f(field.Value())
+			if err != nil {
+				return err
+			}
+			break
 		}
 		return setFieldValue(field, v)
 	}
