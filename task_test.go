@@ -41,6 +41,12 @@ type testTaskWeekly struct {
 	Date string `default:"today" adjust:"weekly"`
 }
 
+type testTaskSignificant struct {
+	noopTask
+	Date    string
+	Workers int `significant:"false"`
+}
+
 func TestSetDefaultsString(t *testing.T) {
 	var cases = []struct {
 		task testTask
@@ -150,6 +156,23 @@ func TestTaskID(t *testing.T) {
 	}{
 		{&testTaskWeekly{Date: "2015-07-05"}, "lynd/testTaskWeekly/date-2015-06-29"},
 		{&testTaskYesterday{Date: "2015-07-01"}, "lynd/testTaskYesterday/date-2015-07-01"},
+	}
+
+	for _, c := range cases {
+		Init(c.task)
+		id := TaskID(c.task)
+		if id != c.id {
+			t.Errorf("got %s, want %s", id, c.id)
+		}
+	}
+}
+
+func TestTaskIDSignificant(t *testing.T) {
+	var cases = []struct {
+		task Task
+		id   string
+	}{
+		{&testTaskSignificant{Date: "2015-07-05", Workers: 4}, "lynd/testTaskSignificant/date-2015-07-05"},
 	}
 
 	for _, c := range cases {

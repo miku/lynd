@@ -140,12 +140,12 @@ func Init(task Task) error {
 	return Adjust(task)
 }
 
-// ParameterMap returns a map of all parameters for a task.
+// ParameterMap returns a map of the significant parameters for a task.
 func ParameterMap(task Task) map[string]string {
 	s := structs.New(task)
 	m := make(map[string]string)
 	for _, f := range s.Fields() {
-		if !f.IsExported() {
+		if !f.IsExported() || f.Tag("significant") == "false" {
 			continue
 		}
 		switch f.Kind() {
