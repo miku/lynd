@@ -13,8 +13,7 @@ import (
 type funcMap map[string]func(interface{}) (string, error)
 
 // defaultFuncs contain custom functions, that may be invoked during defaults
-// evaluation. Most useful example might be a "today". Maybe all special
-// methods should carry a prefix, like `s:today`.
+// evaluation. Most useful example might be a "today".
 var defaultsFuncs = funcMap{
 	"today": func(_ interface{}) (string, error) {
 		return time.Now().Format("2006-01-02"), nil
@@ -24,9 +23,9 @@ var defaultsFuncs = funcMap{
 	},
 }
 
+// adjustFunc may alter already existing field values.
 var adjustFuncs = funcMap{
 	"weekly": func(v interface{}) (string, error) {
-		// only on mondays ...
 		s, ok := v.(string)
 		if !ok {
 			return "", fmt.Errorf("must be a string")
@@ -35,17 +34,19 @@ var adjustFuncs = funcMap{
 		if err != nil {
 			return "", err
 		}
-
-		weekday := int(t.Weekday())
-		// first weekday is monday
-		if weekday == 0 {
-			weekday = 7
-		}
-		weekday = weekday - 1
-
+		weekday := shiftWeekday(int(t.Weekday()))
 		d := time.Duration(-weekday) * 24 * time.Hour
 		return t.Add(d).Format("2006-01-02"), nil
 	},
+}
+
+// shiftWeekday makes a week begin on Monday.
+func shiftWeekday(weekday int) int {
+	if weekday == 0 {
+		weekday = 7
+	}
+	weekday = weekday - 1
+	return weekday
 }
 
 // setFieldValue will try to set the value of a given field to v, which is
