@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/miku/structs"
+	"github.com/fatih/structs"
 )
 
 // funcMap maps string keys to functions from interface{} to (string, error).
