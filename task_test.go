@@ -154,8 +154,8 @@ func TestTaskID(t *testing.T) {
 		task Task
 		id   string
 	}{
-		{&testTaskWeekly{Date: "2015-07-05"}, "lynd/testTaskWeekly/date-2015-06-29"},
-		{&testTaskYesterday{Date: "2015-07-01"}, "lynd/testTaskYesterday/date-2015-07-01"},
+		{&testTaskWeekly{Date: "2015-07-05"}, "github.com/miku/lynd/testTaskWeekly/date-2015-06-29"},
+		{&testTaskYesterday{Date: "2015-07-01"}, "github.com/miku/lynd/testTaskYesterday/date-2015-07-01"},
 	}
 
 	for _, c := range cases {
@@ -172,7 +172,7 @@ func TestTaskIDSignificant(t *testing.T) {
 		task Task
 		id   string
 	}{
-		{&testTaskSignificant{Date: "2015-07-05", Workers: 4}, "lynd/testTaskSignificant/date-2015-07-05"},
+		{&testTaskSignificant{Date: "2015-07-05", Workers: 4}, "github.com/miku/lynd/testTaskSignificant/date-2015-07-05"},
 	}
 
 	for _, c := range cases {

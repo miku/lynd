@@ -168,18 +168,6 @@ func mapToSlug(m map[string]string) string {
 	return strings.Join(parts, "-")
 }
 
-// pkgName returns the lowest level package name or panic, if this name cannot
-// be determined. TODO(miku): why not use the whole pkg hierarchy as
-// locations?
-func pkgName(t reflect.Type) string {
-	parts := strings.Split(t.PkgPath(), "/")
-	if len(parts) == 0 {
-		panic("invalid pkg path")
-	}
-	return parts[len(parts)-1]
-
-}
-
 // TaskID returns a string, that uniquely identifies a task. The ID will
 // consist of the task name (its type) and a slugified version of its
 // significant parameters.
@@ -189,5 +177,5 @@ func TaskID(task Task) string {
 		t = t.Elem()
 	}
 	pmap := ParameterMap(task)
-	return fmt.Sprintf("%s/%s/%s", pkgName(t), t.Name(), strings.ToLower(mapToSlug(pmap)))
+	return fmt.Sprintf("%s/%s/%s", t.PkgPath(), t.Name(), strings.ToLower(mapToSlug(pmap)))
 }
