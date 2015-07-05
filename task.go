@@ -10,6 +10,7 @@ import (
 )
 
 // funcMap maps string keys to functions from interface{} to (string, error).
+// TODO(miku): make types for string and field parameter funcs?
 type funcMap map[string]func(interface{}) (string, error)
 
 // defaultFuncs contain custom functions, that may be invoked during defaults
@@ -81,10 +82,10 @@ func setFieldValue(field *structs.Field, v string) error {
 	return nil
 }
 
-// SetDefaults evaluates the default struct tag if the field has the zero
-// value. A pointer to a task must be passed in, since they this methods
-// potentially alters field values. Subsequent calls to SetDefaults should not
-// change the task, since any zero value has been filled on the first call or
+// SetDefaults evaluates the default struct tag only if the field has the zero
+// value. A pointer to a task must be passed in, since this method potentially
+// alters field values. Subsequent calls to SetDefaults will not change the
+// task, since either any zero value has been filled on the first call or
 // SetDefaults returned an error.
 func SetDefaults(task Task) error {
 	s := structs.New(task)
@@ -109,9 +110,9 @@ func SetDefaults(task Task) error {
 }
 
 // Adjust performs further (and final) adjustments to task parameters. While
-// SetDefaults will set default values, only if no value was given for a task,
-// Adjust will alter existing values. For example, dates can be mapped to
-// certain intervals.
+// SetDefaults will set default values, only if no value was given for a
+// parameter, Adjust will alter only existing values. For example, dates can
+// be mapped to certain intervals.
 func Adjust(task Task) error {
 	s := structs.New(task)
 	for _, field := range s.Fields() {
