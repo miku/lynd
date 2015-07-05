@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/fatih/structs"
@@ -139,10 +140,53 @@ func Init(task Task) error {
 	return Adjust(task)
 }
 
+// ParameterMap returns a map of all parameters for a task.
+func ParameterMap(task Task) map[string]string {
+	s := structs.New(task)
+	m := make(map[string]string)
+	for _, f := range s.Fields() {
+		if !f.IsExported() {
+			continue
+		}
+		switch f.Kind() {
+		case reflect.String, reflect.Int, reflect.Int64, reflect.Float64:
+			m[f.Name()] = fmt.Sprintf("%s", f.Value())
+		default:
+			continue
+		}
+	}
+	return m
+}
+
+func mapToSlug(m map[string]string) string {
+	var parts []string
+	for k, v := range m {
+		parts = append(parts, k)
+		parts = append(parts, v)
+	}
+	return strings.Join(parts, "-")
+}
+
+// pkgName returns the lowest level package name or panic, if this name cannot
+// be determined. TODO(miku): why not use the whole pkg hierarchy as
+// locations?
+func pkgName(t reflect.Type) string {
+	parts := strings.Split(t.PkgPath(), "/")
+	if len(parts) == 0 {
+		panic("invalid pkg path")
+	}
+	return parts[len(parts)-1]
+
+}
+
 // TaskID returns a string, that uniquely identifies a task. The ID will
 // consist of the task name (its type) and a slugified version of its
 // significant parameters.
 func TaskID(task Task) string {
 	t := reflect.TypeOf(task)
-	return fmt.Sprintf("%s", t.Name())
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	pmap := ParameterMap(task)
+	return fmt.Sprintf("%s/%s/%s", pkgName(t), t.Name(), strings.ToLower(mapToSlug(pmap)))
 }

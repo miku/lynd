@@ -148,7 +148,7 @@ func TestTaskID(t *testing.T) {
 		task Task
 		id   string
 	}{
-		{testTaskWeekly{}, "testTaskWeekly-date-2015-06-29"},
+		{&testTaskWeekly{}, "lynd/testTaskWeekly/date-2015-06-29"},
 	}
 
 	for _, c := range cases {
