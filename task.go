@@ -176,6 +176,6 @@ func TaskID(task Task) string {
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
-	pmap := ParameterMap(task)
-	return fmt.Sprintf("%s/%s/%s", t.PkgPath(), t.Name(), strings.ToLower(mapToSlug(pmap)))
+	pm := ParameterMap(task)
+	return fmt.Sprintf("%s/%s/%s", t.PkgPath(), t.Name(), strings.ToLower(mapToSlug(pm)))
 }
