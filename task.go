@@ -9,34 +9,76 @@ import (
 	"github.com/miku/structs"
 )
 
-// funcMap maps string keys to functions from string to (string, error).
-type funcMap map[string]func(string) (string, error)
+// funcMap maps string keys to functions from interface{} to (string, error).
+type funcMap map[string]func(interface{}) (string, error)
 
 // defaultFuncs contain custom functions, that may be invoked during defaults
 // evaluation. Most useful example might be a "today". Maybe all special
 // methods should carry a prefix, like `s:today`.
 var defaultsFuncs = funcMap{
-	"today": func(value string) (string, error) {
+	"today": func(_ interface{}) (string, error) {
 		return time.Now().Format("2006-01-02"), nil
 	},
-	"yesterday": func(value string) (string, error) {
+	"yesterday": func(_ interface{}) (string, error) {
 		return time.Now().Add(-24 * time.Hour).Format("2006-01-02"), nil
 	},
-	// more here? ...
-	//
-	// "weekly"
-	// "weekly:<weekday>"
-	// "random"
-	// "func:someCustomFuncOnStruct"
-	//
-	// ...
-	//
-	// custom func could be circumvented with a generic content based filepath
-	// e.g.
-	//      allow AutoTargets to be generated from the output of a task
-	//      task.Run will be always called, but the task may report completion, if nothing has changed
-	//      e.g. a ftp mirror and the output of the task is just a list of mirrored files.
-	//
+}
+
+var adjustFuncs = funcMap{
+	"weekly": func(v interface{}) (string, error) {
+		// only on mondays ...
+		s, ok := v.(string)
+		if !ok {
+			return "", fmt.Errorf("must be a string")
+		}
+		t, err := time.Parse("2006-01-02", s)
+		if err != nil {
+			return "", err
+		}
+
+		weekday := int(t.Weekday())
+		// first weekday is monday
+		if weekday == 0 {
+			weekday = 7
+		}
+		weekday = weekday - 1
+
+		d := time.Duration(-weekday) * 24 * time.Hour
+		return t.Add(d).Format("2006-01-02"), nil
+	},
+}
+
+// setFieldValue will try to set the value of a given field to v, which is
+// given as string and converted to the field type as required.
+func setFieldValue(field *structs.Field, v string) error {
+	switch field.Kind() {
+	case reflect.String:
+		err := field.Set(v)
+		if err != nil {
+			return err
+		}
+	case reflect.Int, reflect.Int64:
+		i, err := strconv.Atoi(v)
+		if err != nil {
+			return err
+		}
+		err = field.Set(i)
+		if err != nil {
+			return err
+		}
+	case reflect.Float64:
+		f, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			return err
+		}
+		err = field.Set(f)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("cannot set field value for field kind %s", field.Kind())
+	}
+	return nil
 }
 
 // SetDefaults evaluates the default struct tag if the field has the zero
@@ -61,35 +103,36 @@ func SetDefaults(task Task) error {
 				if err != nil {
 					return err
 				}
+				break
 			}
 		}
-		switch field.Kind() {
-		case reflect.String:
-			err := field.Set(v)
-			if err != nil {
-				return err
-			}
-		case reflect.Int, reflect.Int64:
-			i, err := strconv.Atoi(v)
-			if err != nil {
-				return err
-			}
-			err = field.Set(i)
-			if err != nil {
-				return err
-			}
-		case reflect.Float64:
-			f, err := strconv.ParseFloat(v, 64)
-			if err != nil {
-				return err
-			}
-			err = field.Set(f)
-			if err != nil {
-				return err
-			}
-		default:
-			return fmt.Errorf("cannot set default for %s", field.Kind())
+		return setFieldValue(field, v)
+	}
+	return nil
+}
+
+// Adjust performs further (and final) adjustments to task parameters. While
+// SetDefaults will set default values, only if no value was given for a task,
+// Adjust will alter existing values. For example, dates can be mapped to
+// certain intervals.
+func Adjust(task Task) error {
+	s := structs.New(task)
+	for _, field := range s.Fields() {
+		v := field.Tag("adjust")
+		if v == "" {
+			continue
 		}
+		var err error
+		for key, f := range adjustFuncs {
+			if v == key {
+				v, err = f(field.Value())
+				if err != nil {
+					return err
+				}
+				break
+			}
+		}
+		return setFieldValue(field, v)
 	}
 	return nil
 }

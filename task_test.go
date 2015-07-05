@@ -36,6 +36,11 @@ type testTaskYesterday struct {
 	Date string `default:"yesterday"`
 }
 
+type testTaskWeekly struct {
+	noopTask
+	Date string `default:"today" adjust:"weekly"`
+}
+
 func TestSetDefaultsString(t *testing.T) {
 	var cases = []struct {
 		task testTask
@@ -115,6 +120,23 @@ func TestSetDefaultsYesterday(t *testing.T) {
 
 	for _, c := range cases {
 		SetDefaults(&c.task)
+		if c.task.Date != c.Date {
+			t.Errorf("got %s, want %s", c.task.Date, c.Date)
+		}
+	}
+}
+
+func TestSetDefaultsWeekly(t *testing.T) {
+	var cases = []struct {
+		task testTaskWeekly
+		Date string
+	}{
+		{testTaskWeekly{}, "2015-06-29"},
+	}
+
+	for _, c := range cases {
+		SetDefaults(&c.task)
+		Adjust(&c.task)
 		if c.task.Date != c.Date {
 			t.Errorf("got %s, want %s", c.task.Date, c.Date)
 		}
