@@ -140,6 +140,11 @@ func Init(task Task) error {
 	return Adjust(task)
 }
 
+func Make(task Task) (Task, error) {
+	err := Init(task)
+	return task, err
+}
+
 // ParameterMap returns a map of the significant parameters for a task.
 func ParameterMap(task Task) map[string]string {
 	s := structs.New(task)
