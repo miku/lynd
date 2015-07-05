@@ -133,8 +133,7 @@ func Adjust(task Task) error {
 }
 
 func Init(task Task) error {
-	err := SetDefaults(task)
-	if err != nil {
+	if err := SetDefaults(task); err != nil {
 		return err
 	}
 	return Adjust(task)
