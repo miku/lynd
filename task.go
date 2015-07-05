@@ -35,7 +35,7 @@ var adjustFuncs = funcMap{
 			return "", err
 		}
 		weekday := shiftWeekday(int(t.Weekday()))
-		d := time.Duration(-weekday) * 24 * time.Hour
+		d := time.Duration(-weekday+1) * 24 * time.Hour
 		return t.Add(d).Format("2006-01-02"), nil
 	},
 }
@@ -96,16 +96,13 @@ func SetDefaults(task Task) error {
 		if v == "" {
 			continue
 		}
-		var err error
-		for key, f := range defaultsFuncs {
-			if v != key {
-				continue
-			}
+		f, ok := defaultsFuncs[v]
+		if ok {
+			var err error
 			v, err = f(v)
 			if err != nil {
 				return err
 			}
-			break
 		}
 		return setFieldValue(field, v)
 	}
@@ -124,17 +121,14 @@ func Adjust(task Task) error {
 			continue
 		}
 		var err error
-		for key, f := range adjustFuncs {
-			if v != key {
-				continue
-			}
+		f, ok := adjustFuncs[v]
+		if ok {
 			v, err = f(field.Value())
 			if err != nil {
 				return err
 			}
-			break
+			return setFieldValue(field, v)
 		}
-		return setFieldValue(field, v)
 	}
 	return nil
 }
