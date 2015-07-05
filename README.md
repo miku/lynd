@@ -60,3 +60,5 @@ type MyTask struct {
 
 Then again, these validations would not be expressable without a lot of
 different types, whereas one can always add validation rules.
+
+Seems like [govalidator](https://github.com/asaskevich/govalidator) could be a nice match.
