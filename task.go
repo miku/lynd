@@ -96,8 +96,7 @@ func SetDefaults(task Task) error {
 		if v == "" {
 			continue
 		}
-		f, ok := defaultsFuncs[v]
-		if ok {
+		if f, ok := defaultsFuncs[v]; ok {
 			var err error
 			v, err = f(v)
 			if err != nil {
@@ -121,8 +120,7 @@ func Adjust(task Task) error {
 			continue
 		}
 		var err error
-		f, ok := adjustFuncs[v]
-		if ok {
+		if f, ok := adjustFuncs[v]; ok {
 			v, err = f(field.Value())
 			if err != nil {
 				return err
