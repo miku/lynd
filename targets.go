@@ -46,8 +46,9 @@ func (t *Failed) Exists() bool { return false }
 // File is a local file target. Most common type of target. It encapsulates
 // basic atomicity by writing to a temporary file first.
 type File struct {
-	Path string
-	f    *os.File
+	Path  string
+	f     *os.File
+	isTmp bool
 }
 
 // Read from io.Reader.
@@ -70,6 +71,7 @@ func (t *File) Write(p []byte) (n int, err error) {
 			return 0, err
 		}
 		t.f = f
+		t.isTmp = true
 	}
 	return t.f.Write(p)
 }
@@ -81,9 +83,12 @@ func (t *File) Close() error {
 		if err != nil {
 			return err
 		}
-		err = rename(t.f.Name(), t.Path)
-		if err != nil {
-			return err
+		if t.isTmp {
+			err = rename(t.f.Name(), t.Path)
+			if err != nil {
+				return err
+			}
+			t.isTmp = false
 		}
 		t.f = nil
 	}
