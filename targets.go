@@ -52,6 +52,7 @@ type File struct {
 }
 
 // Read from io.Reader.
+// TODO(miku): Check-lock-check.
 func (t *File) Read(p []byte) (n int, err error) {
 	if t.f == nil {
 		f, err := os.Open(t.Path)
@@ -64,6 +65,7 @@ func (t *File) Read(p []byte) (n int, err error) {
 }
 
 // Write from io.Writer.
+// TODO(miku): Check-lock-check.
 func (t *File) Write(p []byte) (n int, err error) {
 	if t.f == nil {
 		f, err := ioutil.TempFile("", tempPrefix)
@@ -77,6 +79,7 @@ func (t *File) Write(p []byte) (n int, err error) {
 }
 
 // Close from io.Closer.
+// TODO(miku): Check-lock-check.
 func (t *File) Close() error {
 	if t.f != nil {
 		err := t.f.Close()
