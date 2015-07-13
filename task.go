@@ -133,6 +133,9 @@ func Adjust(task Task) error {
 	return nil
 }
 
+// Init will update task parameter values according to struct tags. Defaults
+// and adjustments. Tasks must be passed in with pointers, since they will be
+// altered in place.
 func Init(task Task) error {
 	if err := SetDefaults(task); err != nil {
 		return err
@@ -140,6 +143,8 @@ func Init(task Task) error {
 	return Adjust(task)
 }
 
+// Make is like init, but a task is returned. Note, that the task interface
+// provides access to task parameters at them moment.
 func Make(task Task) (Task, error) {
 	err := Init(task)
 	return task, err
