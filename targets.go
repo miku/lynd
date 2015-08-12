@@ -9,24 +9,24 @@ import (
 const tempPrefix = "lynd-"
 
 // WithoutIO implements an io.ReadWriteCloser, that does nothing.
-type WithoutIO struct{}
+type NopIO struct{}
 
 // Close is a noop.
-func (t *WithoutIO) Close() error { return nil }
+func (t *NopIO) Close() error { return nil }
 
 // Read is not implemented.
-func (t *WithoutIO) Read(p []byte) (n int, err error) {
+func (t *NopIO) Read(p []byte) (n int, err error) {
 	return 0, errNotImplemented
 }
 
 // Write is not implemented.
-func (t *WithoutIO) Write(p []byte) (n int, err error) {
+func (t *NopIO) Write(p []byte) (n int, err error) {
 	return 0, errNotImplemented
 }
 
 // Done is a target, that justs always exists. It does not support any IO.
 type Done struct {
-	WithoutIO
+	NopIO
 }
 
 // Name, to satisfy the interface, not really useful.
@@ -37,7 +37,7 @@ func (t *Done) Exists() bool { return true }
 
 // Failed is a target, that never exists.It does not support any IO.
 type Failed struct {
-	WithoutIO
+	NopIO
 }
 
 func (t *Failed) Name() string { return "<failed>" }
